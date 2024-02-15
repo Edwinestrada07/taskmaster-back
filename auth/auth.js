@@ -13,7 +13,7 @@ app.post('/signup', async (req, res) => {
             }
         })
         if(existingUser) {
-            return res. status(400).send('El correo electrónico ya existe')
+            return res.status(400).send('El correo electrónico ya existe')
         }
         
         //Creación de un nuevo usuario
