@@ -1,10 +1,11 @@
 import Express from 'express'
 import User from './user.model.js'
 import Op from 'sequelize'
+import { validateToken } from '../authMiddleware/authMiddleware.js'
 
 const app = Express.Router()
 
-app.get('/user', async (req, res) => {
+app.get('/user', validateToken, async (req, res) => {
     try {
         const { name } = req.query
 
@@ -25,7 +26,7 @@ app.get('/user', async (req, res) => {
     }
 })
 
-app.get('/user/:id', async (req, res) => {
+app.get('/user/:id', validateToken, async (req, res) => {
     const user = await User.findOne({
         where: {
             status: 'ACTIVE',
@@ -41,14 +42,14 @@ app.get('/user/:id', async (req, res) => {
     res.send(user)
 })
 
-app.post('/user', async (req, res) => {
+app.post('/user', validateToken, async (req, res) => {
     const user = await User.create(req.body)
     user.save()
 
     res.send({ status: 'success', user})
 })
 
-app.put('/user/:id', async (req, res) => {
+app.put('/user/:id', validateToken, async (req, res) => {
     const user = await User.update(req.body, {
         where: {
             id: req.params.id
@@ -57,7 +58,7 @@ app.put('/user/:id', async (req, res) => {
     res.send({ status: 'success', user})
 })
 
-app.delete('/user/:id', async (req, res) => {
+app.delete('/user/:id', validateToken, async (req, res) => {
     await User.destroy({
         where: {
             id: req.params.id
