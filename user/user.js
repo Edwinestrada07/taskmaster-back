@@ -1,7 +1,7 @@
 import Express from 'express'
 import User from './user.model.js'
 import Op from 'sequelize'
-import { validateToken } from '../authMiddleware/authMiddleware.js'
+import validateToken from '../authMiddleware/authMiddleware.js'
 
 const app = Express.Router()
 
