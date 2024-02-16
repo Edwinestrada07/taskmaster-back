@@ -16,12 +16,19 @@ app.get('/task', validateToken, async (req, res) => {
 })
 
 app.post('/task', validateToken, async (req, res) => {
-    const task = await Task.create(req.body); 
-    task.save();
+    const task = await Task.create(req.body)
+    task.save()
 
-    res.send({ status: "success", task });
+    res.send({ status: "success", task })
 })
 
-app.put('/task')
+app.put('/task/:id', validateToken, async (req, res) => {
+    const task = await Task.update(req.body, {
+        where: {
+            id: req.params.id
+        }
+    })
+    res.send({ status: "success", task })
+})
 
 export default app;
