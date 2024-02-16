@@ -22,4 +22,6 @@ app.post('/task', validateToken, async (req, res) => {
     res.send({ status: "success", task });
 })
 
-export default app
+app.put('/task')
+
+export default app;
