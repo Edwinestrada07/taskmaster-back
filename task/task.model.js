@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from '../connect.js'
+import User from "../user/user.model.js";
 
 class Task extends Model {
 }
@@ -19,6 +20,9 @@ Task.init({
     sequelize,
     modelName: 'Task'
 })
+
+Task.belongsTo(User, { foreignKey: 'userId' })
+User.hasMany(Task, { foreignKey: 'userId' })
 
 Task.sync({ alter:true })
 

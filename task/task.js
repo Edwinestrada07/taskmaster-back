@@ -31,4 +31,14 @@ app.put('/task/:id', validateToken, async (req, res) => {
     res.send({ status: "success", task })
 })
 
+app.delete('/task/:id', validateToken, async (req, res) => {
+    await Task.destroy({
+        where: {
+            id: req.params.id
+        },
+        individual: true
+    })
+    res.send({ status: "success" })
+})
+
 export default app;
