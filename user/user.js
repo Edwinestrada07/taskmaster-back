@@ -1,11 +1,8 @@
 import Express from 'express'
-//import multer from 'multer';
 import User from './user.model.js'
 import validateToken from '../authMiddleware/authMiddleware.js'
 
 const app = Express.Router()
-
-//const upload = multer({ dest: 'uploads/' }); // Directorio donde se guardará la foto de perfil
 
 app.get('/user/profile', validateToken, async (req, res) => {
     try {
@@ -14,7 +11,7 @@ app.get('/user/profile', validateToken, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' })
         }
-        res.json(user)
+        res.json(user) 
 
     } catch (error) {
         console.error(error)
@@ -62,7 +59,7 @@ app.put('/user/profile', validateToken, async (req, res) => {
         console.error(error);
         res.status(500).json({ message: 'Hubo un error al actualizar la información del usuario' })
     }
-});
+})
 
 app.delete('/user/:id', validateToken, async (req, res) => {
     try {
@@ -83,42 +80,29 @@ app.delete('/user/:id', validateToken, async (req, res) => {
 })
 
 // Ruta para cambiar la contraseña del usuario
-app.put('/change-password', validateToken, async (req, res) => {
+app.put('/user/change-password', validateToken, async (req, res) => {
     try {
-        const userId = req.user.id;
-        const { password, newPassword } = req.body;
-        const user = await User.findOne(userId);
+        const userId = req.user.id
+        const { password, newPassword } = req.body
+        const user = await User.findByPk(userId)
+
         if (!user) {
-          return res.status(404).json({ message: 'Usuario no encontrado' });
+          return res.status(404).json({ message: 'Usuario no encontrado' })
         }
+
         if (password !== user.password) {
-          return res.status(400).json({ message: 'La contraseña actual es incorrecta' });
+          return res.status(400).json({ message: 'La contraseña actual es incorrecta' })
         }
-        user.password = newPassword;
-        await user.save();
-        res.json({ status: 'success' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Hubo un error al cambiar la contraseña' });
-    }
-});
 
+        user.password = newPassword
+        await user.save()
 
-// Ruta para cargar una imagen de perfil
-app.post('/upload-profile-image', validateToken, /*upload.single('profileImage'),*/ async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const user = await User.findByPk(userId);
-        if (!user) {
-          return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        user.profileImage = req.file.path; // Guardamos la ruta de la imagen de perfil
-        await user.save();
-        res.json({ status: 'success' });
+        res.json({ status: 'success' })
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Hubo un error al cambiar la foto de perfil' });
+        console.error(error)
+        res.status(500).json({ message: 'Hubo un error al cambiar la contraseña' })
     }
-});
-  
+})
+ 
 export default app
