@@ -1,32 +1,28 @@
 import Express from 'express'
+//import multer from 'multer';
 import User from './user.model.js'
-import Op from 'sequelize'
 import validateToken from '../authMiddleware/authMiddleware.js'
 
 const app = Express.Router()
 
-app.get('/user', validateToken, async (req, res) => {
+//const upload = multer({ dest: 'uploads/' }); // Directorio donde se guardará la foto de perfil
+
+app.get('/user/profile', validateToken, async (req, res) => {
     try {
-        const { name } = req.query
-
-        const conditions = {}
-        conditions.status = 'ACTIVE'
-
-        if(name) {
-            conditions.name = { [Op.iLike]: `%${name}%` }
+        const userId = req.user.id
+        const user = await User.findOne({ where: { id: userId } })
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' })
         }
-
-        const user = await User.findAll({
-            where : conditions
-        })
-        res.send(user)
+        res.json(user)
 
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error '})
+        console.error(error)
+        res.status(500).json({ message: 'Hubo un error al obtener la información del usuario' })
     }
 })
 
-app.get('/user/:id', validateToken, async (req, res) => {
+/*app.get('/user/:id', validateToken, async (req, res) => {
     const user = await User.findOne({
         where: {
             status: 'ACTIVE',
@@ -40,84 +36,88 @@ app.get('/user/:id', validateToken, async (req, res) => {
         })
     }
     res.send(user)
-})
+})*/
 
 app.post('/user', validateToken, async (req, res) => {
-    const user = await User.create(req.body)
-    user.save()
+    try {
+        const newUser = await User.create(req.body);
+        res.status(201).json({ status: 'success', user: newUser })
 
-    res.send({ status: 'success', user})
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Hubo un error al crear el usuario' })
+    }
 })
 
-app.put('/user/:id', validateToken, async (req, res) => {
-    const user = await User.update(req.body, {
-        where: {
-            id: req.params.id
+app.put('/user/profile', validateToken, async (req, res) => {
+    try {
+        const userId = req.user.id
+        const [updatedCount] = await User.update(req.body, { where: { id: userId } })
+        if (updatedCount === 0) {
+            return res.status(404).json({ message: 'Usuario no encontrado' })
         }
-    })
-    res.send({ status: 'success', user})
-})
+        res.json({ status: 'success' })
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Hubo un error al actualizar la información del usuario' })
+    }
+});
 
 app.delete('/user/:id', validateToken, async (req, res) => {
-    await User.destroy({
-        where: {
-            id: req.params.id
-        },
-        individualHooks: true
-    })
-    res.send({ status: 'success' })
+    try {
+        const deletedCount = await User.destroy({
+            where: { id: req.params.id },
+            individualHooks: true
+        })
+
+        if (deletedCount === 0) {
+            return res.status(404).json({ message: 'Usuario no encontrado' })
+        }
+        res.json({ status: 'success' })
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Hubo un error al eliminar el usuario' })
+    }
 })
 
 // Ruta para cambiar la contraseña del usuario
 app.put('/change-password', validateToken, async (req, res) => {
-    // Obtener el ID de usuario del token JWT
-    const userId = req.user.id;
-  
-    // Obtener la contraseña actual, la nueva contraseña y el ID del usuario del cuerpo de la solicitud
-    const { currentPassword, newPassword } = req.body;
-  
     try {
-        // Verificar si la contraseña actual es válida
-        const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
-        const hashedPassword = user.rows[0].password;
-        const passwordMatch = await bcrypt.compare(currentPassword, hashedPassword);
-    
-        if (!passwordMatch) {
-            return res.status(401).json({ error: 'Contraseña actual incorrecta' });
+        const userId = req.user.id;
+        const { password, newPassword } = req.body;
+        const user = await User.findOne(userId);
+        if (!user) {
+          return res.status(404).json({ message: 'Usuario no encontrado' });
         }
-    
-        // Hashear la nueva contraseña
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    
-        // Actualizar la contraseña en la base de datos
-        await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedNewPassword, userId]);
-    
-        res.status(200).json({ message: 'Contraseña actualizada correctamente' });
-
+        if (password !== user.password) {
+          return res.status(400).json({ message: 'La contraseña actual es incorrecta' });
+        }
+        user.password = newPassword;
+        await user.save();
+        res.json({ status: 'success' });
     } catch (error) {
-        console.error('Error al cambiar la contraseña:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        console.error(error);
+        res.status(500).json({ message: 'Hubo un error al cambiar la contraseña' });
     }
 });
 
 
 // Ruta para cargar una imagen de perfil
-app.post('/upload-profile-image', validateToken, async (req, res) => {
-    // Obtener el ID de usuario del token JWT
-    const userId = req.user.id;
-  
-    // Obtener el archivo de imagen del cuerpo de la solicitud
-    const profileImage = req.file;
-  
+app.post('/upload-profile-image', validateToken, /*upload.single('profileImage'),*/ async (req, res) => {
     try {
-      // Guardar la URL de la imagen de perfil en la base de datos o en algún sistema de almacenamiento
-      // En este ejemplo, supongamos que guardamos la URL en la base de datos
-      await pool.query('UPDATE users SET profile_image_url = $1 WHERE id = $2', [profileImage.path, userId]);
-  
-      res.status(200).json({ message: 'Imagen de perfil actualizada correctamente' });
+        const userId = req.user.id;
+        const user = await User.findByPk(userId);
+        if (!user) {
+          return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        user.profileImage = req.file.path; // Guardamos la ruta de la imagen de perfil
+        await user.save();
+        res.json({ status: 'success' });
     } catch (error) {
-      console.error('Error al subir la imagen de perfil:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
+        console.error(error);
+        res.status(500).json({ message: 'Hubo un error al cambiar la foto de perfil' });
     }
 });
   
