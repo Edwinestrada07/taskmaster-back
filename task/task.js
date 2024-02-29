@@ -32,13 +32,13 @@ app.put('/task/:id', validateToken, async (req, res) => {
 })
 
 app.delete('/task/:id', validateToken, async (req, res) => {
-    await Task.destroy({
+    const task = await Task.destroy({
         where: {
             id: req.params.id
         },
         individual: true
     })
-    res.send({ status: "success" })
+    res.send({ status: "success", task })
 })
 
 export default app;
