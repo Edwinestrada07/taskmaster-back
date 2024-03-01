@@ -1,14 +1,27 @@
 import Express from 'express'
 import Task from './task.model.js'
+import Sequelize from 'sequelize'
 import validateToken from '../authMiddleware/authMiddleware.js'
 
 const app = Express.Router()
 
 app.get('/task', validateToken, async (req, res) => {
+    const {priority} = req.query
     try {
-        const task = await Task.findAll()
-        res.json(task)
-        
+        if(priority){
+            const tasksByPriority = await Task.findAll({
+                where: {
+                    priority: {
+                        [Sequelize.Op.eq]: `${priority}`,
+                    }
+                }
+            })
+            return res.json(tasksByPriority)
+        }else{
+            const task = await Task.findAll()
+            return res.json(task)
+        }
+                
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: 'Internal Server Error' })
