@@ -6,17 +6,17 @@ import validateToken from '../authMiddleware/authMiddleware.js'
 const app = Express.Router()
 
 app.get('/task', validateToken, async (req, res) => {
-    const {priority} = req.query
+    const {status} = req.query
     try {
-        if(priority){
-            const tasksByPriority = await Task.findAll({
+        if(status){
+            const tasksByStatus = await Task.findAll({
                 where: {
-                    priority: {
-                        [Sequelize.Op.eq]: `${priority}`,
+                    status: {
+                        [Sequelize.Op.eq]: `${status}`,
                     }
                 }
             })
-            return res.json(tasksByPriority)
+            return res.json(tasksByStatus)
         }else{
             const task = await Task.findAll()
             return res.json(task)
