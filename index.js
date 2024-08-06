@@ -14,4 +14,7 @@ app.use(AuthRouter)
 app.use(UserRouter)
 app.use(TaskRouter)
 
-app.listen(5000)
+//Puerto del servidor
+app.listen(5000, () => {
+    console.log(`Aplicación conectada en el puerto ${5000}`)
+  })
