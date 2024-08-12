@@ -15,6 +15,10 @@ Task.init({
         type: DataTypes.ENUM(['PENDING', 'IN_PROGRESS', 'COMPLETED']), 
         defaultValue: 'PENDING'
     },
+    isFavorite: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 }, {
     sequelize,
     modelName: 'Task'

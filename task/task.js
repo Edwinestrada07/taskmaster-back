@@ -54,4 +54,30 @@ app.delete('/task/:id', validateToken, async (req, res) => {
     res.send({ status: "success", task })
 })
 
+// Obtener tareas favoritas
+app.get('/task/favorites', async (req, res) => {
+    try {
+        const tasks = await Task.findAll({ where: { isFavorite: true } });
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener tareas favoritas.' });
+    }
+});
+
+// Marcar/desmarcar tarea como favorita
+app.post('/task/:id/favorite', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const task = await Task.findByPk(id);
+        if (!task) {
+            return res.status(404).json({ error: 'Tarea no encontrada.' });
+        }
+        task.isFavorite = !task.isFavorite;
+        await task.save();
+        res.json(task);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar el estado de la tarea.' });
+    }
+});
+
 export default app;
