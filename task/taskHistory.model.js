@@ -2,16 +2,16 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from '../connect.js';
 import User from "../user/user.model.js";
 
-class Task extends Model {}
+class TaskHistory extends Model {}
 
-Task.init({
+TaskHistory.init({
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     description: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
     },
     dueDate: {
@@ -19,11 +19,11 @@ Task.init({
         allowNull: true
     },
     priority: {
-        type: DataTypes.ENUM(['LOW', 'MEDIUM', 'HIGH']),
-        defaultValue: 'MEDIUM'
+        type: DataTypes.STRING,
+        allowNull: false
     },
     status: {
-        type: DataTypes.ENUM(['PENDING', 'IN_PROGRESS', 'COMPLETED']),
+        type: DataTypes.ENUM(['PENDING', 'IN_PROGRESS', 'COMPLETED']), 
         defaultValue: 'PENDING'
     },
     isFavorite: {
@@ -32,18 +32,19 @@ Task.init({
     },
     completedAt: {
         type: DataTypes.DATE,
-        allowNull: true
+        allowNull: false,
+        defaultValue: DataTypes.NOW
     }
 }, {
     sequelize,
-    modelName: 'Task'
+    modelName: 'TaskHistory'
 });
 
 // Establecer la relación con el modelo User
-Task.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Task, { foreignKey: 'userId' });
+TaskHistory.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(TaskHistory, { foreignKey: 'userId' });
 
 // Sincronización del modelo con la base de datos
-Task.sync({ alter: true });
+TaskHistory.sync({ alter: true });
 
-export default Task;
+export default TaskHistory;
