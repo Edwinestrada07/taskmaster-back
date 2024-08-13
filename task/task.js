@@ -44,6 +44,31 @@ app.put('/task/:id', validateToken, async (req, res) => {
     }
 });
 
+// Actualizar una tarea existente Drag and Drop
+app.put('/task/:id/status', validateToken, async (req, res) => {
+    try {
+        // Verifica que req.body contenga el campo esperado, por ejemplo 'status'
+        if (!req.body.status) {
+            return res.status(400).json({ error: 'Falta el campo de estado.' });
+        }
+
+        // Actualiza la tarea con el ID proporcionado
+        const [updated] = await Task.update(req.body, {
+            where: { id: req.params.id }
+        });
+
+        if (updated) {
+            const updatedTask = await Task.findByPk(req.params.id); // Obtiene la tarea actualizada
+            res.send({ status: "success", task: updatedTask });
+        } else {
+            res.status(404).json({ error: 'Tarea no encontrada.' });
+        }
+    } catch (error) {
+        console.error('Error al actualizar la tarea:', error);
+        res.status(500).json({ error: 'Error al actualizar la tarea.' });
+    }
+});
+
 // Eliminar una tarea
 app.delete('/task/:id', validateToken, async (req, res) => {
     try {
