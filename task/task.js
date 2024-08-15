@@ -130,6 +130,7 @@ app.get('/task/history', validateToken, async (req, res) => {
 
 // Mover tareas completadas al historial
 app.post('/task/:id/move', validateToken, async (req, res) => {
+    console.log('Token recibido:', req.headers.authorization); // Revisa el token
     try {
         const task = await Task.findByPk(req.params.id);
 
