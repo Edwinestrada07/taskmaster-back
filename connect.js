@@ -2,9 +2,14 @@ import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Carga las variables de entorno desde el archivo .env
 dotenv.config();
+
+// Convierte `import.meta.url` a un filename y luego a un directorio
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Ruta al archivo del certificado intermedio
 const sslCertPath = path.resolve(__dirname, './services/SSLcomRSASSLsubCA.crt');
