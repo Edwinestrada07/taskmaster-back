@@ -1,14 +1,22 @@
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
 // Carga las variables de entorno desde el archivo .env
 dotenv.config();
 
-// Usa la URL de conexión proporcionada por Supabase desde las variables de entorno
+// Ruta al archivo del certificado intermedio
+const sslCertPath = path.resolve(__dirname, './services/SSLcomRSASSLsubCA.crt');
+
+// Lee el certificado desde el archivo
+const sslCert = fs.readFileSync(sslCertPath).toString();
+
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialectOptions: {
     ssl: {
       require: true,
+      ca: sslCert,  // Incluye el certificado intermedio
     }
   }
 });
@@ -21,6 +29,7 @@ sequelize
   })
   .catch((error) => {
     console.error('Error al conectar a la base de datos:', error);
+    console.error('Detalles del error:', error.original);
   });
 
 export default sequelize;
