@@ -26,8 +26,7 @@ app.get('/', (req, res) => {
   res.send('El servidor está funcionando')
 })
 
-// Puerto del servidor
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => {
-  console.log(`Aplicación conectada en el puerto ${PORT}`)
+//Puerto del servidor
+app.listen(5000, () => {
+  console.log(`Example app listening on port ${5000}`)
 })
