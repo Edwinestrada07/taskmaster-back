@@ -1,40 +1,27 @@
 import Sequelize from 'sequelize';
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-// Carga las variables de entorno desde el archivo .env
-dotenv.config();
-
-// Convierte `import.meta.url` a un filename y luego a un directorio
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Ruta al archivo del certificado intermedio
-const sslCertPath = path.resolve(__dirname, './services/SSLcomRSASSLsubCA.crt');
-
-// Lee el certificado desde el archivo
-const sslCert = fs.readFileSync(sslCertPath).toString();
-
+// Usa la URL de conexión proporcionada por Supabase desde las variables de entorno
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialectOptions: {
-    ssl: {
-      require: true,
-      ca: sslCert,  // Incluye el certificado intermedio
-    }
-  }
+    dialect: 'postgres',
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false // Deshabilitar la verificación SSL
+        }
+    },
+    logging: false // Opcional: desactiva el log de Sequelize para mayor limpieza
 });
 
 // Conexión a la base de datos por medio de Sequelize
 sequelize
-  .authenticate()
-  .then(() => {
-    console.log('Conectado a la base de datos con éxito.');
-  })
-  .catch((error) => {
-    console.error('Error al conectar a la base de datos:', error);
-    console.error('Detalles del error:', error.original);
-  });
+    .authenticate()
+    .then(() => {
+        console.log('Conexión a la base de datos exitosa.');
+    })
+    .catch(err => {
+        console.error('Error al conectar a la base de datos:', err);
+    });
 
 export default sequelize;
+
+
