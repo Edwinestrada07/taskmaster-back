@@ -8,7 +8,7 @@ function validateToken(req, res, next) {
         return
     }
     try {
-        const decode = jwt.verify(token, '3de113c0-757c-45be-a5ab-238221699cd2' )
+        const decode = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET )
         req.user = {
             id: decode.id
         }
