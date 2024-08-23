@@ -8,27 +8,33 @@ const app = express.Router();
 // Ruta para el registro de usuarios
 app.post('/signup', async (req, res) => {
     try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).send('Faltan campos requeridos');
+        }
+
         const existingUser = await User.findOne({
             where: {
-                email: req.body.email
+                email: email
             }
         });
+
         if (existingUser) {
             return res.status(400).send('El correo electrónico ya existe');
         }
 
-        // Hash de la contraseña
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Creación de un nuevo usuario
         const newUser = await User.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword, // Guardar la contraseña hasheada
+            name: name,
+            email: email,
+            password: hashedPassword,
         });
+
         const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
             expiresIn: '1h',
-        });        
+        });
 
         res.status(201).send({ token, user: { ...newUser.dataValues }, message: "Usuario registrado correctamente" });
 
@@ -37,6 +43,7 @@ app.post('/signup', async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 // Ruta para iniciar sesión
 app.post('/login', async (req, res) => {
@@ -53,7 +60,7 @@ app.post('/login', async (req, res) => {
         // Comparar la contraseña proporcionada con el hash almacenado
         const isMatch = await bcrypt.compare(req.body.password, user.password);
         if (isMatch) {
-            const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
                 expiresIn: '1h',
             });
             
@@ -67,5 +74,6 @@ app.post('/login', async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 export default app;
