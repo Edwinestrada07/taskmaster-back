@@ -71,22 +71,27 @@ app.put('/user/change-password', validateToken, async (req, res) => {
     try {
         const userId = req.user.id;
         const { password, newPassword } = req.body;
+
+        // Buscar al usuario en la base de datos
         const user = await User.findByPk(userId);
 
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        // Verificar la contraseña actual
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
             return res.status(400).json({ message: 'La contraseña actual es incorrecta' });
         }
 
+        // Encriptar la nueva contraseña
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         await user.save();
 
         res.json({ status: 'success' });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Hubo un error al cambiar la contraseña' });
