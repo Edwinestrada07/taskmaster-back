@@ -1,19 +1,25 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-const verifyToken = (req, res, next) => {
+function validateToken(req, res, next) {
     const token = req.headers['authorization'];
 
     if (!token) {
-        return res.status(403).json({ message: 'No se ha proporcionado un token' });
+        return res.status(405).send('No autorizado');
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.userId = decoded.id;
+        req.user = {
+            id: decoded.id,
+        };
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Token no válido' });
+        if (error.name === 'TokenExpiredError') {
+            return res.status(405).send('Token expirado. Genere un nuevo token');
+        } else {
+            return res.status(405).send('Token no válido');
+        }
     }
-};
+}
 
-module.exports = verifyToken;
+export default validateToken;
