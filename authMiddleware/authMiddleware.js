@@ -1,26 +1,19 @@
-import jwt from 'jsonwebtoken'
+const jwt = require('jsonwebtoken');
 
-function validateToken(req, res, next) {
-    const token = req.headers[ 'authorization' ]
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization'];
 
-    if(!token) {
-        res.status(405).send('not auth')
-        return
+    if (!token) {
+        return res.status(403).json({ message: 'No se ha proporcionado un token' });
     }
+
     try {
-        const decode = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET )
-        req.user = {
-            id: decode.id
-        }
-        next()
-
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.userId = decoded.id;
+        next();
     } catch (error) {
-        if(error.name === 'TokenExpitedError') {
-            res.status(405).send('Token expirado. Genere un nuevo token')
-        }else {
-            res.status(405).send('Token no valido')
-        }
+        res.status(401).json({ message: 'Token no válido' });
     }
-}
+};
 
-export default validateToken
+module.exports = verifyToken;
