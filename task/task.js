@@ -1,6 +1,6 @@
 import Express from 'express';
 import Task from './task.model.js';
-import TaskHistory from './taskHistory.model.js'; // Asegúrate de importar tu modelo de historial
+import TaskHistory from './taskHistory.model.js';
 import Sequelize from 'sequelize';
 import validateToken from '../authMiddleware/authMiddleware.js';
 
@@ -9,10 +9,11 @@ const app = Express.Router();
 // Obtener todas las tareas o tareas por estado
 app.get('/task', validateToken, async (req, res) => {
     const { status } = req.query;
+    const userId = req.user.id; // Obtener el ID del usuario desde el token
     try {
         const tasks = status
-            ? await Task.findAll({ where: { status: { [Sequelize.Op.eq]: status } } })
-            : await Task.findAll();
+            ? await Task.findAll({ where: { status: { [Sequelize.Op.eq]: status }, userId } }) // Filtrar por userId
+            : await Task.findAll({ where: { userId } }); // Filtrar por userId
         res.json(tasks);
     } catch (error) {
         console.error(error);
@@ -22,8 +23,9 @@ app.get('/task', validateToken, async (req, res) => {
 
 // Obtener tareas favoritas
 app.get('/task/favorites', validateToken, async (req, res) => {
+    const userId = req.user.id;
     try {
-        const tasks = await Task.findAll({ where: { isFavorite: true } });
+        const tasks = await Task.findAll({ where: { isFavorite: true, userId } }); // Filtrar por userId
         res.json(tasks);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener tareas favoritas.' });
@@ -32,8 +34,9 @@ app.get('/task/favorites', validateToken, async (req, res) => {
 
 // Obtener historial de tareas completadas
 app.get('/task/history', validateToken, async (req, res) => {
+    const userId = req.user.id;
     try {
-        const taskHistory = await TaskHistory.findAll();
+        const taskHistory = await TaskHistory.findAll({ where: { userId } }); // Filtrar por userId
         res.status(200).json(taskHistory);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener el historial de tareas.' });
@@ -43,19 +46,21 @@ app.get('/task/history', validateToken, async (req, res) => {
 // Crear una nueva tarea
 app.post('/task', validateToken, async (req, res) => {
     try {
-        const task = await Task.create(req.body);
-        res.send({ status: "success", task });
+        const userId = req.user.id;
+        const task = await Task.create({ ...req.body, userId });
+        res.send({ status: "Éxito al crear tarea", task });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error al crear la tarea.' });
+        res.status(500).json({ error: 'Hubo un error al crear la tarea.' });
     }
 });
 
 // Marcar/desmarcar tarea como favorita
 app.post('/task/:id/favorite', validateToken, async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id;
     try {
-        const task = await Task.findByPk(id);
+        const task = await Task.findOne({ where: { id, userId } }); // Filtrar por userId
         if (!task) {
             return res.status(404).json({ error: 'Tarea no encontrada.' });
         }
@@ -69,31 +74,28 @@ app.post('/task/:id/favorite', validateToken, async (req, res) => {
 
 // Mover tareas completadas al historial
 app.post('/task/:id/move', validateToken, async (req, res) => {
-    console.log('Token recibido:', req.headers.authorization); // Revisa el token
+    const userId = req.user.id;
     try {
-        const task = await Task.findByPk(req.params.id);
+        const task = await Task.findOne({ where: { id: req.params.id, userId } }); // Filtrar por userId
 
         if (!task) {
             return res.status(404).json({ error: 'Tarea no encontrada' });
         }
 
-        // Verifica si la tarea está completada
         if (task.status !== 'COMPLETED') {
             return res.status(400).json({ error: 'Solo se pueden mover tareas completadas al historial.' });
         }
 
-        // Mover la tarea al historial
         await TaskHistory.create({
             description: task.description,
             dueDate: task.dueDate,
             priority: task.priority,
             status: task.status,
             isFavorite: task.isFavorite,
-            userId: task.userId,  // Asegúrate de transferir el userId
-            completedAt: task.updatedAt  // Puedes utilizar la fecha de actualización o crear un campo `completedAt` específico
+            userId: task.userId,
+            completedAt: task.updatedAt
         });
 
-        // Eliminar la tarea de la tabla principal
         await task.destroy();
 
         res.status(200).json({ message: 'Tarea movida al historial con éxito' });
@@ -105,9 +107,10 @@ app.post('/task/:id/move', validateToken, async (req, res) => {
 
 // Actualizar una tarea existente
 app.put('/task/:id', validateToken, async (req, res) => {
+    const userId = req.user.id;
     try {
         const task = await Task.update(req.body, {
-            where: { id: req.params.id }
+            where: { id: req.params.id, userId } // Filtrar por userId
         });
         res.send({ status: "success", task });
     } catch (error) {
@@ -118,19 +121,18 @@ app.put('/task/:id', validateToken, async (req, res) => {
 
 // Actualizar una tarea existente Drag and Drop
 app.put('/task/:id/status', validateToken, async (req, res) => {
+    const userId = req.user.id;
     try {
-        // Verifica que req.body contenga el campo esperado, por ejemplo 'status'
         if (!req.body.status) {
             return res.status(400).json({ error: 'Falta el campo de estado.' });
         }
 
-        // Actualiza la tarea con el ID proporcionado
         const [updated] = await Task.update(req.body, {
-            where: { id: req.params.id }
+            where: { id: req.params.id, userId } // Filtrar por userId
         });
 
         if (updated) {
-            const updatedTask = await Task.findByPk(req.params.id); // Obtiene la tarea actualizada
+            const updatedTask = await Task.findOne({ where: { id: req.params.id, userId } }); // Filtrar por userId
             res.send({ status: "success", task: updatedTask });
         } else {
             res.status(404).json({ error: 'Tarea no encontrada.' });
@@ -143,9 +145,10 @@ app.put('/task/:id/status', validateToken, async (req, res) => {
 
 // Eliminar una tarea
 app.delete('/task/:id', validateToken, async (req, res) => {
+    const userId = req.user.id;
     try {
         const task = await Task.destroy({
-            where: { id: req.params.id }
+            where: { id: req.params.id, userId } // Filtrar por userId
         });
         res.send({ status: "success", task });
     } catch (error) {
@@ -156,10 +159,10 @@ app.delete('/task/:id', validateToken, async (req, res) => {
 
 // Eliminar todas las tareas del historial
 app.delete('/task/:id/history', validateToken, async (req, res) => {
+    const userId = req.user.id;
     try {
-        // Elimina todas las tareas en el historial
         const deletedCount = await TaskHistory.destroy({
-            where: {} // Esto eliminará todas las filas en la tabla TaskHistory
+            where: { userId } // Filtrar por userId
         });
 
         if (deletedCount === 0) {

@@ -40,8 +40,8 @@ Task.init({
 });
 
 // Establecer la relación con el modelo User
-Task.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Task, { foreignKey: 'userId' });
+Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
 
 // Sincronización del modelo con la base de datos
 Task.sync({ alter: true });
