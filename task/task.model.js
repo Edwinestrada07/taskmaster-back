@@ -1,6 +1,6 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from "sequelize";
 import sequelize from '../connect.js';
-import User from '../user/user.model.js';
+import User from "../user/user.model.js";
 
 class Task extends Model {}
 
@@ -38,6 +38,9 @@ Task.init({
     sequelize,
     modelName: 'Task'
 });
+
+// Sincronización del modelo con la base de datos
+Task.sync({ alter: true });
 
 // Establecer la relación con el modelo User
 Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
