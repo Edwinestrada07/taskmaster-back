@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../connect.js";
-import Task from "./task.js";
+import Task from "../task/task.js";
 
 class TaskDetail extends Model {}
 
