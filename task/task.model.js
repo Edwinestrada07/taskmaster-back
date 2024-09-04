@@ -1,7 +1,6 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../connect.js';
-import User from "../user/user.model.js";
-import TaskDetail from "../task/taskDetail.model.js";
+import User from '../user/user.model.js';
 
 class Task extends Model {}
 
@@ -44,5 +43,4 @@ Task.init({
 Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
 
-// Sincronización de los modelos con la base de datos
 export default Task;
