@@ -1,6 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from '../connect.js';
 import User from "../user/user.model.js";
+import TaskDetail from "./taskDetail.model.js";
 
 class Task extends Model {}
 
@@ -42,6 +43,10 @@ Task.init({
 // Establecer la relación con el modelo User
 Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
+
+// Establecer la relación con el modelo TaskDetail
+Task.hasMany(TaskDetail, { foreignKey: 'taskId', as: 'details' });
+TaskDetail.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
 
 // Sincronización del modelo con la base de datos
 Task.sync({ alter: true });
