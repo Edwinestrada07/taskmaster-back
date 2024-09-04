@@ -106,16 +106,17 @@ app.post('/task/:id/move', validateToken, async (req, res) => {
 });
 
 // Actualizar una tarea existente
-app.put('/task/:id', validateToken, async (req, res) => {
-    const userId = req.user.id;
+app.put('/task/:id', async (req, res) => {
     try {
-        const task = await Task.update(req.body, {
-            where: { id: req.params.id, userId } // Filtrar por userId
-        });
-        res.send({ status: "success", task });
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).send('Tarea no encontrada');
+
+        task.details = req.body.details; // Guardar detalles
+        await task.save();
+
+        res.status(200).send(task);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al actualizar la tarea.' });
+        res.status(500).send('Error al actualizar la tarea');
     }
 });
 
@@ -175,5 +176,21 @@ app.delete('/task/:id/history', validateToken, async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar las tareas del historial.' });
     }
 });
+
+//Eliminar Detalle de tareas
+app.delete('/task/:id/detail/:detailId', async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).send('Tarea no encontrada');
+
+        task.details.splice(req.params.detailId, 1); // Eliminar detalle
+        await task.save();
+
+        res.status(200).send(task);
+    } catch (error) {
+        res.status(500).send('Error al eliminar el detalle');
+    }
+});
+
 
 export default app;
