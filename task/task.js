@@ -1,7 +1,7 @@
 import Express from "express";
 import Task from "./task.model.js";
 import TaskHistory from "./taskHistory.model.js";
-import TaskDetail from "./taskDetail.model.js";
+import TaskDetail from "./taskDetail.js";
 import Sequelize from "sequelize";
 import validateToken from "../authMiddleware/authMiddleware.js";
 
@@ -106,11 +106,9 @@ app.post("/task/:id/move", validateToken, async (req, res) => {
     }
 
     if (task.status !== "COMPLETED") {
-      return res
-        .status(400)
-        .json({
-          error: "Solo se pueden mover tareas completadas al historial.",
-        });
+      return res.status(400).json({
+        error: "Solo se pueden mover tareas completadas al historial.",
+      });
     }
 
     await TaskHistory.create({
@@ -241,11 +239,9 @@ app.delete("/task/:id/history", validateToken, async (req, res) => {
     });
 
     if (deletedCount === 0) {
-      return res
-        .status(404)
-        .json({
-          message: "No se encontraron tareas en el historial para eliminar.",
-        });
+      return res.status(404).json({
+        message: "No se encontraron tareas en el historial para eliminar.",
+      });
     }
 
     res
