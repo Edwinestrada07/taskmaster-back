@@ -1,17 +1,16 @@
-
 import sequelize from './connect.js';
-import Task from './task/task.js';
-import TaskDetail from './task/taskDetail.model.js';
-import User from './user/user.model.js';
+import './task/task.js';
+import './task/taskDetail.model.js';
+import './user/user.model.js';
 
 const syncModels = async () => {
     try {
-        // Aquí podemos sincronizar todos los modelos
         await sequelize.sync({ alter: true });
-        console.log('Modelos sincronizados con éxito');
+        console.log('Modelos sincronizados correctamente.');
     } catch (error) {
         console.error('Error al sincronizar modelos:', error);
+        throw error; // Esto permitirá capturar el error en el index.js
     }
 };
 
-syncModels();
+export default syncModels;

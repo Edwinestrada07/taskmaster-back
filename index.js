@@ -5,6 +5,8 @@ import dotenv from 'dotenv'
 import AuthRouter from './auth/auth.js'
 import UserRouter from './user/user.js'
 import TaskRouter from './task/task.js'
+import syncModels from './syncModels.js';
+
 
 dotenv.config()
 
@@ -32,8 +34,9 @@ syncModels().then(() => {
 
   // Iniciar el servidor solo después de la sincronización
   app.listen(5000, () => {
-      console.log('Servidor corriendo en el puerto 3000');
+    console.log('Servidor corriendo en el puerto 5000');
   });
+
 }).catch(error => {
   console.error('Error al sincronizar modelos:', error);
 });
