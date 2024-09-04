@@ -44,15 +44,5 @@ Task.init({
 Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
 
-// Establecer la relación con el modelo TaskDetail
-Task.hasMany(TaskDetail, { foreignKey: 'taskId', as: 'details' });
-TaskDetail.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
-
 // Sincronización de los modelos con la base de datos
-const syncModels = async () => {
-    await sequelize.sync({ alter: true });
-};
-
-syncModels();
-
 export default Task;

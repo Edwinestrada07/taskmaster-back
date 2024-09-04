@@ -26,7 +26,14 @@ app.get('/', (req, res) => {
   res.send('El servidor está funcionando')
 })
 
-//Puerto del servidor
-app.listen(5000, () => {
-  console.log(`Example app listening on port ${5000}`)
-})
+// Sincronización de modelos
+syncModels().then(() => {
+  console.log('Modelos sincronizados. Iniciando la aplicación...');
+
+  // Iniciar el servidor solo después de la sincronización
+  app.listen(5000, () => {
+      console.log('Servidor corriendo en el puerto 3000');
+  });
+}).catch(error => {
+  console.error('Error al sincronizar modelos:', error);
+});
