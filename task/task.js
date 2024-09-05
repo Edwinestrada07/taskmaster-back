@@ -4,7 +4,6 @@ import TaskHistory from './taskHistory.model.js';
 import TaskDetail from './taskDetail.model.js';
 import Sequelize from 'sequelize';
 import validateToken from '../authMiddleware/authMiddleware.js';
-import TaskDetail from './taskDetail.model.js';
 
 const app = Express.Router();
 
