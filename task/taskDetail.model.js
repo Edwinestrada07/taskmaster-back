@@ -28,9 +28,6 @@ TaskDetail.init({
 });
 
 // Definir las relaciones después de la inicialización del modelo.
-TaskDetail.belongsTo(Task, { foreignKey: 'taskId' });
-
-// Sincronización del modelo con la base de datos
-TaskDetail.sync({ alter: true });
+TaskDetail.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
 
 export default TaskDetail;
