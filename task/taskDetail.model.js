@@ -5,16 +5,21 @@ import Task from '../task/task.js';
 class TaskDetail extends Model {}
 
 TaskDetail.init({
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    detail: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
     taskId: {
         type: DataTypes.INTEGER,
         references: {
         model: Task,
         key: 'id',
         },
-        allowNull: false,
-    },
-    detail: {
-        type: DataTypes.TEXT,
         allowNull: false,
     },
 }, {
