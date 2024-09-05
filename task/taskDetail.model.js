@@ -14,20 +14,12 @@ TaskDetail.init({
         type: DataTypes.TEXT,
         allowNull: false,
     },
-    taskId: {
-        type: DataTypes.INTEGER,
-        references: {
-        model: Task,
-        key: 'id',
-        },
-        allowNull: false,
-    },
-}, {
     sequelize,
     modelName: 'TaskDetail',
 });
 
-TaskDetail.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
+TaskDetail.belongsTo(Task, { foreignKey: 'taskId' });
+Task.hasMany(TaskDetail, { foreignKey: 'taskId'})
 
 // Sincronización del modelo con la base de datos
 TaskDetail.sync({ alter: true });
