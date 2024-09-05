@@ -39,11 +39,11 @@ Task.init({
     modelName: 'Task'
 });
 
-// Relación con el modelo de User
+// Establecer la relación con el modelo User
 Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
 
-// Sincronización
+// Sincronización del modelo con la base de datos
 Task.sync({ alter: true });
 
 export default Task;
