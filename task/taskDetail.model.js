@@ -1,6 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../connect.js';
-import Task from './task.model.js';
 
 class TaskDetail extends Model {}
 
@@ -26,9 +25,6 @@ TaskDetail.init({
     sequelize, 
     modelName: 'TaskDetail'
 });
-
-// Relaciones
-TaskDetail.hasMany(Task, { foreignKey: 'taskId', as: 'task' });
 
 // Sincronización
 TaskDetail.sync({ alter: true });
