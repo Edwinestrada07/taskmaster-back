@@ -28,7 +28,7 @@ TaskDetail.init({
 });
 
 // Relaciones
-TaskDetail.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
+TaskDetail.hasMany(Task, { foreignKey: 'taskId', as: 'task' });
 
 // Sincronización
 TaskDetail.sync({ alter: true });
