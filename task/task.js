@@ -126,14 +126,14 @@ app.post('/task/:id/move', validateToken, async (req, res) => {
 
 // Crear un nuevo detalle de tarea
 app.post('/task/:id/details', validateToken, async (req, res) => {
-    const { taskId } = req.params;
     const { detail } = req.body;
+    const { taskId } = req.params;
 
     try {
         // Crear nuevo detalle
         const newDetail = await TaskDetail.create({
-            taskId,
-            detail
+            detail,
+            taskId
         });
 
         res.status(201).json(newDetail);
