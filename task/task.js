@@ -182,7 +182,7 @@ app.put('/task/:id/status', validateToken, async (req, res) => {
     }
 });
 
-app.put('/task/:id/detail/:id', validateToken, async (req, res) => {
+app.put('/task/:taskId/detail/:detailId', validateToken, async (req, res) => {
     const { taskId, detailId } = req.params;
     const { detail } = req.body;
 
@@ -239,7 +239,7 @@ app.delete('/task/:id/history', validateToken, async (req, res) => {
     }
 });
 
-app.delete('/task/:id/detail/:id', validateToken, async (req, res) => {
+app.delete('/task/:taskId/detail/:detailId', validateToken, async (req, res) => {
     const { taskId, detailId } = req.params;
 
     try {
