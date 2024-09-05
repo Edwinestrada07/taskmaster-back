@@ -11,7 +11,6 @@ import TaskRouter from './task/task.js';
 import Task from './task/task.model.js';
 import TaskDetail from './task/taskDetail.model.js';
 import User from './user/user.model.js'; // Asegúrate de que este archivo contiene el modelo de User
-import TaskHistory from './task/taskHistory.model.js'; // Si necesitas relacionar TaskHistory con otras tablas
 
 dotenv.config();
 
@@ -29,15 +28,11 @@ TaskDetail.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
 Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
 
-TaskHistory.belongsTo(User, { foreignKey: 'userId', as: 'user' });
-User.hasMany(TaskHistory, { foreignKey: 'userId', as: 'taskHistory' });
-
 // Sincronizar los modelos con la base de datos
 (async () => {
   await User.sync({ alter: true });
   await Task.sync({ alter: true });
   await TaskDetail.sync({ alter: true });
-  await TaskHistory.sync({ alter: true });
 })();
 
 // Configurar rutas
