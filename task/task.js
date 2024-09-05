@@ -46,7 +46,7 @@ app.get('/task/history', validateToken, async (req, res) => {
 });
 
 // Obtener detalles de una tarea
-app.get('/task/:id/details', validateToken, async (req, res) => {
+app.get('/task/:id/detail', validateToken, async (req, res) => {
     const { taskId } = req.params;
     
     try {
@@ -125,7 +125,7 @@ app.post('/task/:id/move', validateToken, async (req, res) => {
 });
 
 // Crear un nuevo detalle de tarea
-app.post('/task/:id/details', validateToken, async (req, res) => {
+app.post('/task/:id/detail', validateToken, async (req, res) => {
     const { detail } = req.body;
     const { taskId } = req.params;
 
@@ -182,7 +182,7 @@ app.put('/task/:id/status', validateToken, async (req, res) => {
     }
 });
 
-app.put('/task/:id/details/:id', validateToken, async (req, res) => {
+app.put('/task/:id/detail/:id', validateToken, async (req, res) => {
     const { taskId, detailId } = req.params;
     const { detail } = req.body;
 
@@ -239,7 +239,7 @@ app.delete('/task/:id/history', validateToken, async (req, res) => {
     }
 });
 
-app.delete('/task/:id/details/:id', validateToken, async (req, res) => {
+app.delete('/task/:id/detail/:id', validateToken, async (req, res) => {
     const { taskId, detailId } = req.params;
 
     try {
