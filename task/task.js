@@ -1,11 +1,14 @@
 import Express from 'express';
 import Task from './task.model.js';
 import TaskHistory from './taskHistory.model.js';
+import TaskDetail from './taskDetail.model.js';
 import Sequelize from 'sequelize';
 import validateToken from '../authMiddleware/authMiddleware.js';
+import TaskDetail from './taskDetail.model.js';
 
 const app = Express.Router();
 
+//>>>>>GET<<<<<//
 // Obtener todas las tareas o tareas por estado
 app.get('/task', validateToken, async (req, res) => {
     const { status } = req.query;
@@ -43,6 +46,23 @@ app.get('/task/history', validateToken, async (req, res) => {
     }
 });
 
+// Obtener detalles de una tarea
+app.get('/task/:id/details', validateToken, async (req, res) => {
+    const { taskId } = req.params;
+    
+    try {
+        const details = await TaskDetail.findAll({
+            where: { taskId },
+            order: [['createdAt', 'ASC']], // Opcional: ordenar por fecha de creación
+        });
+        res.json(details);
+    } catch (error) {
+        console.error('Error al obtener detalles de la tarea:', error);
+        res.status(500).json({ message: 'Error al obtener los detalles.' });
+    }
+});
+
+//>>>>>POST<<<<<//
 // Crear una nueva tarea
 app.post('/task', validateToken, async (req, res) => {
     try {
@@ -105,6 +125,26 @@ app.post('/task/:id/move', validateToken, async (req, res) => {
     }
 });
 
+// Crear un nuevo detalle de tarea
+app.post('/task/:id/details', validateToken, async (req, res) => {
+    const { taskId } = req.params;
+    const { detail } = req.body;
+
+    try {
+        // Crear nuevo detalle
+        const newDetail = await TaskDetail.create({
+            taskId,
+            detail
+        });
+
+        res.status(201).json(newDetail);
+    } catch (error) {
+        console.error('Error al crear el detalle de la tarea:', error);
+        res.status(500).json({ message: 'Error al crear el detalle.' });
+    }
+});
+
+//>>>>>PUT<<<<<//
 // Actualizar una tarea existente
 app.put('/task/:id', validateToken, async (req, res) => {
     const userId = req.user.id;
@@ -119,7 +159,7 @@ app.put('/task/:id', validateToken, async (req, res) => {
     }
 });
 
-// Actualizar una tarea existente Drag and Drop
+// Actualizar una tarea existente (Drag and Drop)
 app.put('/task/:id/status', validateToken, async (req, res) => {
     const userId = req.user.id;
     try {
@@ -143,6 +183,30 @@ app.put('/task/:id/status', validateToken, async (req, res) => {
     }
 });
 
+app.put('/task/:id/details/:id', validateToken, async (req, res) => {
+    const { taskId, detailId } = req.params;
+    const { detail } = req.body;
+
+    try {
+        const TaskDetail = await TaskDetail.findOne({
+            where: { id: detailId, taskId},
+        });
+
+        if (!TaskDetail) {
+            return res.status(404).json({ message: 'Detalle no encontrado.'});
+        }
+
+        TaskDetail.detail = detail;
+        await TaskDetail.save();
+
+        res.json(TaskDetail);
+    } catch (error) {
+        console.error('Error al actualizar el detalle de la tarea', error);
+        res.status(500).json({ message: 'Error al actualizar el detalle' });
+    }
+})
+
+//>>>>>DELETE<<<<<//
 // Eliminar una tarea
 app.delete('/task/:id', validateToken, async (req, res) => {
     const userId = req.user.id;
@@ -175,5 +239,26 @@ app.delete('/task/:id/history', validateToken, async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar las tareas del historial.' });
     }
 });
+
+app.delete('/task/:id/details/:id', validateToken, async (req, res) => {
+    const { taskId, detailId } = req.params;
+
+    try {
+        const taskDetail = await taskDetail.findOne({
+            where: { id: detailId, taskId },
+        });
+
+        if (!taskDetail) {
+            return res.status(404).json({ message: 'Detalle no encontrado.' });
+        }
+
+        await taskDetail.destroy();
+
+        res.json({ message: 'Detalle eliminado exitosamente.' });
+    } catch (error) {
+        console.error('Error al eliminar el detalle de la tarea:', error);
+        res.status(500).json({ message: 'Error al eliminar el detalle.' });
+    }
+})
 
 export default app;
