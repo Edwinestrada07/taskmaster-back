@@ -47,8 +47,8 @@ app.get('/task/history', validateToken, async (req, res) => {
 
 // Obtener detalles de una tarea
 app.get('/task/:id/detail', validateToken, async (req, res) => {
-    const { taskId } = req.params;
-    
+    const { id: taskId } = req.params;
+
     try {
         const details = await TaskDetail.findAll({
             where: { taskId },
@@ -127,7 +127,7 @@ app.post('/task/:id/move', validateToken, async (req, res) => {
 // Crear un nuevo detalle de tarea
 app.post('/task/:id/detail', validateToken, async (req, res) => {
     const { detail } = req.body;
-    const { taskId } = req.params;
+    const { id: taskId } = req.params;
 
     try {
         // Crear nuevo detalle
@@ -187,23 +187,23 @@ app.put('/task/:id/detail/:id', validateToken, async (req, res) => {
     const { detail } = req.body;
 
     try {
-        const TaskDetail = await TaskDetail.findOne({
-            where: { id: detailId, taskId},
+        const taskDetail = await TaskDetail.findOne({
+            where: { id: detailId, taskId },
         });
 
-        if (!TaskDetail) {
-            return res.status(404).json({ message: 'Detalle no encontrado.'});
+        if (!taskDetail) {
+            return res.status(404).json({ message: 'Detalle no encontrado.' });
         }
 
-        TaskDetail.detail = detail;
-        await TaskDetail.save();
+        taskDetail.detail = detail;
+        await taskDetail.save();
 
-        res.json(TaskDetail);
+        res.json(taskDetail);
     } catch (error) {
-        console.error('Error al actualizar el detalle de la tarea', error);
-        res.status(500).json({ message: 'Error al actualizar el detalle' });
+        console.error('Error al actualizar el detalle de la tarea:', error);
+        res.status(500).json({ message: 'Error al actualizar el detalle.' });
     }
-})
+});
 
 //>>>>>DELETE<<<<<//
 // Eliminar una tarea
@@ -243,7 +243,7 @@ app.delete('/task/:id/detail/:id', validateToken, async (req, res) => {
     const { taskId, detailId } = req.params;
 
     try {
-        const taskDetail = await taskDetail.findOne({
+        const taskDetail = await TaskDetail.findOne({
             where: { id: detailId, taskId },
         });
 
@@ -258,6 +258,6 @@ app.delete('/task/:id/detail/:id', validateToken, async (req, res) => {
         console.error('Error al eliminar el detalle de la tarea:', error);
         res.status(500).json({ message: 'Error al eliminar el detalle.' });
     }
-})
+});
 
 export default app;
