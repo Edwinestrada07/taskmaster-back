@@ -45,6 +45,6 @@ TaskHistory.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(TaskHistory, { foreignKey: 'userId' });
 
 // Sincronización del modelo con la base de datos
-TaskHistory.sync({ force: true });
+TaskHistory.sync({ alter: true });
 
 export default TaskHistory;
