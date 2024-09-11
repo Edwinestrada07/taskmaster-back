@@ -206,17 +206,31 @@ app.put('/task/:taskId/detail/:detailId', validateToken, async (req, res) => {
 });
 
 //>>>>>DELETE<<<<<//
-// Eliminar una tarea
+// Eliminar una tarea con sus detalles asociados
 app.delete('/task/:id', validateToken, async (req, res) => {
     const userId = req.user.id;
+    const taskId = req.params.id;
+
     try {
-        const task = await Task.destroy({
-            where: { id: req.params.id, userId } // Filtrar por userId
+        // Primero, elimina los detalles asociados a la tarea
+        await TaskDetail.destroy({
+            where: { taskId }, // Filtrar por id de la tarea
         });
-        res.send({ status: "success", task });
+
+        // Luego, elimina la tarea
+        const task = await Task.destroy({
+            where: { id: taskId, userId } // Filtrar por id de la tarea y el userId
+        });
+
+        // Verificar si se eliminó correctamente la tarea
+        if (!task) {
+            return res.status(404).json({ message: 'Tarea no encontrada.' });
+        }
+
+        res.json({ status: "success", message: 'Tarea y detalles asociados eliminados exitosamente.' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al eliminar la tarea.' });
+        console.error('Error al eliminar la tarea y sus detalles:', error);
+        res.status(500).json({ error: 'Error al eliminar la tarea y sus detalles.' });
     }
 });
 
