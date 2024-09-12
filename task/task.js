@@ -95,16 +95,19 @@ app.post('/task/:id/favorite', validateToken, async (req, res) => {
 app.post('/task/:id/move', validateToken, async (req, res) => {
     const userId = req.user.id;
     try {
-        const task = await Task.findOne({ where: { id: req.params.id, userId } }); // Filtrar por userId
+        // Buscar la tarea por su id y userId
+        const task = await Task.findOne({ where: { id: req.params.id, userId } });
 
         if (!task) {
             return res.status(404).json({ error: 'Tarea no encontrada' });
         }
 
+        // Solo mover tareas completadas
         if (task.status !== 'COMPLETED') {
             return res.status(400).json({ error: 'Solo se pueden mover tareas completadas al historial.' });
         }
 
+        // Mover la tarea al historial
         await TaskHistory.create({
             description: task.description,
             dueDate: task.dueDate,
@@ -115,6 +118,12 @@ app.post('/task/:id/move', validateToken, async (req, res) => {
             completedAt: task.updatedAt
         });
 
+        // Eliminar los detalles asociados a la tarea
+        await TaskDetail.destroy({
+            where: { taskId: task.id } // Filtrar por id de la tarea
+        });
+
+        // Eliminar la tarea original
         await task.destroy();
 
         res.status(200).json({ message: 'Tarea movida al historial con éxito' });
@@ -237,7 +246,6 @@ app.delete('/task/:id', validateToken, async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar la tarea y sus detalles.' });
     }
 });
-
 
 // Eliminar todas las tareas del historial
 app.delete('/task/:id/history', validateToken, async (req, res) => {
