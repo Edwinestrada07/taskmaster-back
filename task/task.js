@@ -213,26 +213,31 @@ app.delete('/task/:id', validateToken, async (req, res) => {
 
     try {
         // Primero, elimina los detalles asociados a la tarea
-        await TaskDetail.destroy({
+        const deletedDetailsCount = await TaskDetail.destroy({
             where: { taskId }, // Filtrar por id de la tarea
         });
 
         // Luego, elimina la tarea
-        const task = await Task.destroy({
+        const deletedTask = await Task.destroy({
             where: { id: taskId, userId } // Filtrar por id de la tarea y el userId
         });
 
         // Verificar si se eliminó correctamente la tarea
-        if (!task) {
+        if (!deletedTask) {
             return res.status(404).json({ message: 'Tarea no encontrada.' });
         }
 
-        res.json({ status: "success", message: 'Tarea y detalles asociados eliminados exitosamente.' });
+        // Responder con un mensaje que incluya el número de detalles eliminados
+        res.json({ 
+            status: "success", 
+            message: `Tarea eliminada exitosamente junto con ${deletedDetailsCount} detalle(s) asociado(s).` 
+        });
     } catch (error) {
         console.error('Error al eliminar la tarea y sus detalles:', error);
         res.status(500).json({ error: 'Error al eliminar la tarea y sus detalles.' });
     }
 });
+
 
 // Eliminar todas las tareas del historial
 app.delete('/task/:id/history', validateToken, async (req, res) => {
