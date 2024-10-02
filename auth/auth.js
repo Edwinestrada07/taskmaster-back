@@ -37,7 +37,7 @@ app.post('/signup', async (req, res) => {
 
         // Genera un token JWT para la autenticación
         const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
+            expiresIn: '3h',
         });
 
         // Respuesta exitosa con el token y los datos del usuario
@@ -69,7 +69,7 @@ app.post('/login', async (req, res) => {
         if (isMatch) {
             // Genera un token JWT si la contraseña es correcta
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-                expiresIn: '1h',
+                expiresIn: '3h',
             });
 
             // Respuesta exitosa con el token y los datos del usuario
