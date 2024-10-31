@@ -1,6 +1,3 @@
-
-### README para el **Backend** (TaskMaster Backend):
-
 # TaskMaster - Backend
 
 Este es el repositorio del backend para la aplicación **TaskMaster**, encargada de gestionar la lógica de negocio relacionada con la creación, actualización, eliminación y obtención de tareas y sus detalles.
