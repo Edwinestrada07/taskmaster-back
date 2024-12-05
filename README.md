@@ -20,26 +20,6 @@ Este es el repositorio del backend para la aplicación **TaskMaster**, encargada
 - **JSON Web Tokens (JWT)**: Para la autenticación de usuarios.
 - **bcryptjs**: Para el cifrado de contraseñas.
 
-## Instalación
-
-1. Clona este repositorio:
-   ```bash
-   git clone https://github.com/Edwinestrada07/taskmaster-back.git
-
-2. Navega al directorio del proyecto:
-
-   **cd taskmaster-backend**
-
-3. Instala las dependencias:
-
-   **npm install**
-
-4. Inicia el servidor:
-
-   **npm node.js**
-
-5. El servidor se ejecutará en http://localhost:5000.
-
 ## Endpoints Principales
 
 - POST /login: Inicia sesión y devuelve un token JWT.
@@ -51,10 +31,6 @@ Este es el repositorio del backend para la aplicación **TaskMaster**, encargada
 - GET /tasks/history: Obtiene el historial de tareas completadas.
 - GET /tasks/:id/details: Obtiene los detalles de una tarea específica.
 - POST /tasks/:id/details: Agrega detalles a una tarea.
-  
-## Scripts Disponibles
-
-- npm node.js: Ejecuta el servidor en modo producción.
 
 ## Estructura del Proyecto
 
@@ -65,9 +41,4 @@ Este es el repositorio del backend para la aplicación **TaskMaster**, encargada
 
 ## Contribuciones
 
-Las contribuciones son bienvenidas. Si deseas colaborar, por favor, abre un issue o crea un pull request con tus mejoras.
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT.
-
+Las contribuciones son bienvenidas.
