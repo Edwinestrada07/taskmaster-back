@@ -1,32 +1,39 @@
-import express  from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv'; // 🟢 Importación agregada correctamente
 
-import AuthRouter from './auth/auth.js'
-import UserRouter from './user/user.js'
-import TaskRouter from './task/task.js'
+// Rutas
+import AuthRouter from './auth/auth.js';
+import UserRouter from './user/user.js';
+import TaskRouter from './task/task.js';
 
-dotenv.config()
+// Conexión a la base de datos
+import sequelize from './connect.js';
 
-const app = express()
+dotenv.config(); // 🟢 Carga de variables de entorno
 
-app.use(cors({ origin: '*' }))
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+const app = express();
 
-app.use(AuthRouter)
-app.use(UserRouter)
-app.use(TaskRouter)
+// Middlewares
+app.use(cors({ origin: '*' }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Servir archivos estáticos desde la carpeta 'dist'
-app.use(express.static('dist'))
+// Rutas de la API
+app.use(AuthRouter);
+app.use(UserRouter);
+app.use(TaskRouter);
 
-// Ruta para verificar el funcionamiento del servidor
-app.get('/', (req, res) => {
-  res.send('El servidor está funcionando')
-})
+// Prueba de conexión a la base de datos
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ Conexión a la base de datos establecida correctamente.');
+  })
+  .catch(err => {
+    console.error('❌ Error al conectar con la base de datos:', err);
+  });
 
-//Puerto del servidor
+// Puerto del servidor
 app.listen(5000, () => {
-  console.log(`Example app listening on port ${5000}`)
-})
+  console.log(`🚀 Servidor corriendo en http://localhost:5000`);
+});

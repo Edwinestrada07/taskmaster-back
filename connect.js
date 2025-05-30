@@ -1,26 +1,9 @@
-import Sequelize from 'sequelize'
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
-// Usa la URL de conexión proporcionada por Supabase desde las variables de entorno
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    dialectOptions: {
-        ssl: {
-            require: true,
-            rejectUnauthorized: false
-        }
-    }
-})
+dotenv.config();
 
-// Conexión a la base de datos por medio de Sequelize
-sequelize
-    .authenticate()
-    .then(() => {
-        console.log('Conectado a la base de datos con éxito.')
-    })
-    .catch((error) => {
-        console.error('Error al conectar a la base de datos:', error)
-    })
+const sequelize = new Sequelize(process.env.DB_URL);
 
-export default sequelize
-
+export default sequelize;
 

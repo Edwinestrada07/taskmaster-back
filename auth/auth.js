@@ -36,9 +36,11 @@ app.post('/signup', async (req, res) => {
         });
 
         // Genera un token JWT para la autenticación
-        const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-            expiresIn: '3h',
-        });
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '3h', algorithm: 'HS256' }
+        );
 
         // Respuesta exitosa con el token y los datos del usuario
         res.status(201).send({ token, user: { ...newUser.dataValues }, message: "Usuario registrado correctamente" });
@@ -67,6 +69,10 @@ app.post('/login', async (req, res) => {
         // Compara la contraseña proporcionada con la almacenada
         const isMatch = await bcrypt.compare(password, user.password);
         if (isMatch) {
+            if (!process.env.JWT_SECRET) {
+                console.error('JWT_SECRET no está definido en el entorno');
+                return res.status(500).send('Error en la configuración del servidor');
+            }
             // Genera un token JWT si la contraseña es correcta
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
                 expiresIn: '3h',
