@@ -26,14 +26,14 @@ app.use(TaskRouter);
 
 // Prueba de conexión a la base de datos
 sequelize.authenticate()
-  .then(() => {
-    console.log('✅ Conexión a la base de datos establecida correctamente.');
-  })
-  .catch(err => {
-    console.error('❌ Error al conectar con la base de datos:', err);
-  });
+    .then(() => {
+        console.log('✅ Conexión a la base de datos establecida correctamente.');
+    })
+    .catch(err => {
+        console.error('❌ Error al conectar con la base de datos:', err);
+    });
 
 // Puerto del servidor
 app.listen(5000, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:5000`);
+    console.log(`🚀 Servidor corriendo en http://localhost:5000`);
 });
